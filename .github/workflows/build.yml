@@ -18,7 +18,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y bc bison flex libssl-dev libelf-dev rsync zip cpio python3
+          sudo apt-get install -y bc bison flex libssl-dev libelf-dev rsync zip cpio python3 pkg-config libyaml-dev
 
       - name: Fetch prebuilt toolchain (AOSP GCC 4.9)
         run: |
@@ -44,6 +44,7 @@ jobs:
           export ARCH=arm64
           export CROSS_COMPILE=aarch64-linux-android-
           export CROSS_COMPILE_ARM32=arm-linux-androideabi-
+          export HOSTCFLAGS="-Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89 -fcommon"
           echo "nproc=$(nproc)"
           make ARCH=arm64 -j"$(nproc)" Image dtbs 2>&1 | tee build.log
 

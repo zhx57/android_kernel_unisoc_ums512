@@ -30,15 +30,15 @@ jobs:
           "$HOME/tc-aarch64/bin/aarch64-linux-android-gcc" --version | head -n1
           "$HOME/tc-arm/bin/arm-linux-androideabi-gcc" --version | head -n1
 
-      - name: Configure (defconfig)
+      - name: Configure (defconfig, out-of-tree)
         run: |
           set -e
           export ARCH=arm64
           export CROSS_COMPILE=aarch64-linux-android-
           export CROSS_COMPILE_ARM32=arm-linux-androideabi-
-          make ARCH=arm64 sprd_sharkle_defconfig
+          make O=out ARCH=arm64 sprd_sharkle_defconfig
 
-      - name: Build kernel
+      - name: Build kernel (out-of-tree)
         run: |
           set -o pipefail
           export ARCH=arm64
@@ -46,7 +46,7 @@ jobs:
           export CROSS_COMPILE_ARM32=arm-linux-androideabi-
           HCF="-Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89 -fcommon"
           echo "nproc=$(nproc)"
-          make ARCH=arm64 HOSTCFLAGS="$HCF" -j"$(nproc)" Image dtbs 2>&1 | tee build.log
+          make O=out ARCH=arm64 HOSTCFLAGS="$HCF" -j"$(nproc)" Image dtbs 2>&1 | tee build.log
 
       - name: Upload artifacts
         if: always()
@@ -54,6 +54,6 @@ jobs:
         with:
           name: kernel-ums512
           path: |
-            arch/arm64/boot/Image
-            arch/arm64/boot/dts/sprd/*.dtb
+            out/arch/arm64/boot/Image
+            out/arch/arm64/boot/dts/sprd/*.dtb
           if-no-files-found: warn
